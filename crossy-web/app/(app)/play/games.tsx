@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { type Database } from '@/lib/database.types'
+import Timer from './games/[slug]/timer'
 
 type Props = {
   games: Array<Database['public']['Tables']['games']['Row']>
@@ -49,6 +50,7 @@ const Games: React.FC<Props> = ({ games }) => {
               <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Players</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Started</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Time</Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -77,6 +79,12 @@ const Games: React.FC<Props> = ({ games }) => {
                   <Table.Cell>{nPlayers}</Table.Cell>
                   <Table.Cell suppressHydrationWarning>
                     {new Date(game.created_at).toLocaleDateString()}
+                  </Table.Cell>
+                  <Table.Cell suppressHydrationWarning>
+                    <Timer
+                      since={new Date(game.created_at).getTime()}
+                      statusOfGame={(game as any).status_of_game}
+                    />
                   </Table.Cell>
                 </Table.Row>
               )
@@ -108,6 +116,7 @@ const Games: React.FC<Props> = ({ games }) => {
               <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Players</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Started</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Time</Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -117,6 +126,24 @@ const Games: React.FC<Props> = ({ games }) => {
                 game.puzzle_id as unknown as Database['public']['Tables']['puzzles']['Row']
 
               const nPlayers = (game as any).game_user.length + 1
+
+              // console.log("game created at ", game.created_at)
+              // console.log("game completed at ", (game as any).status_of_game.game_ended_at)
+
+              const gameLengthInMilliseconds = Math.abs(
+                new Date(game.created_at).getTime() -
+                  new Date((game as any).status_of_game.completed_at).getTime(),
+              )
+              const gameLengthHours = Math.floor(
+                gameLengthInMilliseconds / (1000 * 60 * 60),
+              )
+              const gameLengthMinutes = Math.floor(
+                (gameLengthInMilliseconds % (1000 * 60 * 60)) / (1000 * 60),
+              )
+              const gameLengthSeconds = Math.floor(
+                (gameLengthInMilliseconds % (1000 * 60)) / 1000,
+              )
+
               return (
                 <Table.Row
                   role="link"
@@ -137,6 +164,11 @@ const Games: React.FC<Props> = ({ games }) => {
                   <Table.Cell>{nPlayers}</Table.Cell>
                   <Table.Cell suppressHydrationWarning>
                     {new Date(game.created_at).toLocaleDateString()}
+                  </Table.Cell>
+                  <Table.Cell suppressHydrationWarning>
+                    {
+                      `${gameLengthHours}:${gameLengthMinutes}:${gameLengthSeconds}`
+                    }
                   </Table.Cell>
                 </Table.Row>
               )
