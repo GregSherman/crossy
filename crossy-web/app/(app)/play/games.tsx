@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { type Database } from '@/lib/database.types'
+
 import Timer from './games/[slug]/timer'
 
 type Props = {
@@ -166,9 +167,7 @@ const Games: React.FC<Props> = ({ games }) => {
                     {new Date(game.created_at).toLocaleDateString()}
                   </Table.Cell>
                   <Table.Cell suppressHydrationWarning>
-                    {
-                      `${gameLengthHours}:${gameLengthMinutes}:${gameLengthSeconds}`
-                    }
+                    {`${gameLengthHours}:${gameLengthMinutes}:${gameLengthSeconds}`}
                   </Table.Cell>
                 </Table.Row>
               )
